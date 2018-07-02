@@ -63,7 +63,7 @@ def dev_step(x_batch, y_batch, sequence_length, sess, cnn):
         cnn.dropout_keep_prob: 1.0
     }
     step, loss, accuracy = sess.run(
-        [cnn.gloabl_step, cnn.loss, cnn.accuracy],
+        [cnn.global_step, cnn.loss, cnn.accuracy],
     feed_dict)
     time_str = datetime.datetime.now().isoformat()
     print("{}: Dev_phase!!!: \n step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
