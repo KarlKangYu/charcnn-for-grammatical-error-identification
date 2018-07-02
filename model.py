@@ -82,7 +82,8 @@ class CharCNN(object):
             for i in tvars:
                 print("Variables:", i)
             grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss, tvars), max_grad_norm)
-            optimizer = tf.train.AdamOptimizer(0.001)
+            self.lr = tf.train.exponential_decay(0.01, self.global_step, 10000, 0.96, staircase=True)
+            optimizer = tf.train.GradientDescentOptimizer(self.lr)
             self._train_op = optimizer.apply_gradients(zip(grads, tvars), global_step=self.global_step)
 
     def charCNN(self, input, filters, filter_sizes):

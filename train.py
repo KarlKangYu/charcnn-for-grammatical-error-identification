@@ -49,13 +49,13 @@ def train_step(x_batch, y_batch, sequence_length, sess, cnn):
         cnn.sequence_length: sequence_length,
         cnn.dropout_keep_prob: FLAGS.dropout_keep
     }
-    _, step, loss, accuracy, _ = sess.run(
-        [cnn._train_op, cnn.global_step, cnn.loss, cnn.accuracy, cnn.clear_char_embedding_padding],
+    _, step, loss, accuracy, _, lr = sess.run(
+        [cnn._train_op, cnn.global_step, cnn.loss, cnn.accuracy, cnn.clear_char_embedding_padding, cnn.lr],
         feed_dict)
     time_str = datetime.datetime.now().isoformat()
-    print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+    print("{}: step {}, loss {:g}, acc {:g}, learning rate {:g}".format(time_str, step, loss, accuracy, lr))
 
-def dev_step(x_batch, y_batch, sequence_length, sess, cnn):
+def dev_step(x_batch, y_batch, sequence_length, sess, cnn, max_dev_acc):
     feed_dict = {
         cnn.input: x_batch,
         cnn.label: y_batch,
@@ -65,8 +65,11 @@ def dev_step(x_batch, y_batch, sequence_length, sess, cnn):
     step, loss, accuracy = sess.run(
         [cnn.global_step, cnn.loss, cnn.accuracy],
     feed_dict)
+    if accuracy > max_dev_acc:
+        max_dev_acc = accuracy
     time_str = datetime.datetime.now().isoformat()
     print("{}: Dev_phase!!!: \n step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+    return max_dev_acc
 
 def main(_):
     print("Loading data...")
@@ -115,19 +118,24 @@ def main(_):
                 list(zip(x_train, y_train, seq_train)), FLAGS.batch_size, FLAGS.num_epochs
             )
 
+            gloabl_max_acc = 0
             for batch in batches:
                 x_batch, y_batch, seq_batch = zip(*batch)
                 train_step(x_batch, y_batch, seq_batch, sess, cnn)
                 current_step = tf.train.global_step(sess, cnn.global_step)
                 if current_step % FLAGS.evaluate_every == 0:
+                    max_dev_acc = 0
                     print("\nEvaluation:")
                     batches_dev = data_loader.batch_iter(
                         list(zip(x_dev, y_dev, seq_dev)), FLAGS.batch_size, 1
                     )
                     for batch_dev in batches_dev:
                         x_batch_dev, y_batch_dev, seq_batch_dev = zip(*batch_dev)
-                        dev_step(x_batch_dev, y_batch_dev, seq_batch_dev, sess, cnn)
-                    print("")
+                        max_dev_acc = dev_step(x_batch_dev, y_batch_dev, seq_batch_dev, sess, cnn, max_dev_acc)
+                    print("During this evaluation phase, the max accuracy is:", max_dev_acc)
+                    if max_dev_acc > gloabl_max_acc:
+                        gloabl_max_acc = max_dev_acc
+                    print("\n Until now, the max accuracy is:", gloabl_max_acc)
                 if current_step % FLAGS.checkpoint_every == 0:
                     path = saver.save(sess, os.path.join(save_path, "model"), global_step=current_step)
                     print("Saved model checkpoint to {}\n".format(path))
