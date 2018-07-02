@@ -8,7 +8,7 @@ from model import CharCNN
 flags = tf.flags
 
 # data
-tf.flags.DEFINE_float("dev_percentage", 0.05, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_float("dev_percentage", 0.002, "Percentage of the training data to use for validation")
 flags.DEFINE_string('pos_data',    'data',   'pos data directory. ')
 flags.DEFINE_string('neg_data',    'data',   'neg data directory. ')
 flags.DEFINE_string('save_path',   'model/',     'training directory (models and summaries are saved there periodically)')

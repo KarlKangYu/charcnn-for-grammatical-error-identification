@@ -45,7 +45,7 @@ def read_data(data_path_pos, data_path_neg, max_word_length, max_sequence_length
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
     data = np.array(data)
     data_size = len(data)
-    num_batches_per_epoch = int((len(data) - 1) / batch_size) + 1
+    num_batches_per_epoch = int((len(data)) / batch_size)
     for epoch in range(num_epochs):
         if shuffle:
             shuffle_indices = np.random.permutation(np.arange(data_size))
