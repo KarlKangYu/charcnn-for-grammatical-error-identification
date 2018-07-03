@@ -114,6 +114,14 @@ def main(_):
 
             sess.run(tf.global_variables_initializer())
 
+            check_point_dir = os.path.join(FLAGS.save_path)
+            ckpt = tf.train.get_checkpoint_state(check_point_dir)
+            if ckpt and tf.train.checkpoint_exists(ckpt.model_checkpoint_path):
+                print("Reading model parameters from %s" % ckpt.model_checkpoint_path)
+                saver.restore(sess, ckpt.model_checkpoint_path)
+            else:
+                print("Created model with fresh parameters.")
+
             batches = data_loader.batch_iter(
                 list(zip(x_train, y_train, seq_train)), FLAGS.batch_size, FLAGS.num_epochs
             )
