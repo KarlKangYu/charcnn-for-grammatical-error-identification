@@ -8,15 +8,15 @@ from model import CharCNN
 flags = tf.flags
 
 # data
-tf.flags.DEFINE_float("dev_percentage", 0.002, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_float("dev_percentage", 0.001, "Percentage of the training data to use for validation")
 flags.DEFINE_string('pos_data',    'data',   'pos data directory. ')
 flags.DEFINE_string('neg_data',    'data',   'neg data directory. ')
 flags.DEFINE_string('save_path',   'model/',     'training directory (models and summaries are saved there periodically)')
 
 # model params
 flags.DEFINE_integer('num_classes',        2,                            'class numbers')
-flags.DEFINE_integer('rnn_size',        650,                            'size of LSTM internal state')
-flags.DEFINE_integer('attention_size',        650,                            'size of Attention layer internal state')
+flags.DEFINE_integer('rnn_size',        2048,                            'size of LSTM internal state')
+flags.DEFINE_integer('attention_size',        2048,                            'size of Attention layer internal state')
 flags.DEFINE_integer('num_highway_layers',  1,                              'number of highway layers')
 flags.DEFINE_integer('char_vocab_size', 31,                             'character vocab size')
 flags.DEFINE_integer('char_embed_size', 15,                             'dimensionality of character embeddings')
@@ -32,8 +32,8 @@ flags.DEFINE_float  ('max_grad_norm',       5.0,  'normalize gradients at')
 flags.DEFINE_integer('max_word_length',     15,   'maximum word length')
 
 # bookkeeping
-flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
-flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
+flags.DEFINE_integer("evaluate_every", 10000, "Evaluate model on dev set after this many steps (default: 100)")
+flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 100)")
 
 # Misc Parameters
 flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -91,7 +91,8 @@ def main(_):
         session_conf = tf.ConfigProto(
             allow_soft_placement=FLAGS.allow_soft_placement,
             log_device_placement=FLAGS.log_device_placement)
-        session_conf.gpu_options.per_process_gpu_memory_fraction = 0.45
+        session_conf.gpu_options.allow_growth = True
+        #session_conf.gpu_options.per_process_gpu_memory_fraction = 0.45
         sess = tf.Session(config=session_conf)
         with sess.as_default():
             cnn = CharCNN(char_vocab_size=FLAGS.char_vocab_size,
