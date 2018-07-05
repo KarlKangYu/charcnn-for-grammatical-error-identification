@@ -19,7 +19,7 @@ flags.DEFINE_integer('rnn_size',        2048,                            'size o
 flags.DEFINE_integer('attention_size',        2048,                            'size of Attention layer internal state')
 flags.DEFINE_integer('num_highway_layers',  1,                              'number of highway layers')
 flags.DEFINE_integer('char_vocab_size', 31,                             'character vocab size')
-flags.DEFINE_integer('char_embed_size', 15,                             'dimensionality of character embeddings')
+flags.DEFINE_integer('char_embed_size', 150,                             'dimensionality of character embeddings')
 flags.DEFINE_string ('filters',         '[1,2,3,4,5,6,7]',              'CNN filter widths')
 flags.DEFINE_string ('filter_sizes', '[50,100,150,200,200,200,200]', 'number of features in the CNN filters')
 flags.DEFINE_float  ('dropout_keep',         0.5,                            'dropout_keep 1 = no dropout')
